@@ -1,4 +1,4 @@
-var burl = "http://localhost:8080/api/meetings/dt/5,53";
+var burl = "http://localhost:8080/api/meetings/dt/9,53,8,6";
 
 var lc2pShowStart = '1';
 // Display column for start date?
@@ -17,7 +17,7 @@ var lc2pShowTags = '1';
 var lc2pShowTagsTitle = '';
 
 var lc2pDateFormat = 'DD/MM/YYYY';
-var lc2pPerPage= 50;
+var lc2pPerPage= 5;
 
 if (lc2pDateFormat != "") {
 	momentDateFormat = lc2pDateFormat;
