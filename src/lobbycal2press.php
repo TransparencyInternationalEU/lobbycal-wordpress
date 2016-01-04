@@ -2,46 +2,41 @@
 /*
  * Plugin Name: lobbycal2press for wordpress
  * Plugin URI: http://lobbycal.transparency.eu
- * Description: Plugin to display meetings from lobbycal.transparency.eu. Based on http://datatables.net/dev/knockout/
- * Version: 1.0
- * Author: GREENS EFA EU
+ * Description: Plugin to display meetings from lobbycal.transparency.eu
+ * Version: 2.0
+ * Author: lobbycal dev
  * Author URI: http://lobbycal.transparency.eu
  * License: GPL
  */
 function lobbycal2press_scripts() {
 	
 	// Load custom scripts
-	wp_enqueue_script ( 'jquery' );
-	wp_enqueue_script ( 'jquery.datatables', plugin_dir_url ( __FILE__ ) . 'jquery.datatables.js', array (
+	wp_enqueue_script ( 'jquery', plugin_dir_url ( __FILE__ ) . './js/jquery.js', array (
+			'jquery'
+	), '2.0', true );wp_enqueue_script ( 'jquery.spring-friendly', plugin_dir_url ( __FILE__ ) . './js/jquery.spring-friendly.js', array (
+			'jquery'
+	), '2.0', true );
+	wp_enqueue_script ( 'jquery.datatables', plugin_dir_url ( __FILE__ ) . './js/jquery.datatables.js', array (
 			'jquery' 
-	), '1.0', true );
-	wp_enqueue_script ( 'knockout-min', plugin_dir_url ( __FILE__ ) . 'knockout-min.js', array (
+	), '2.0', true );
+	wp_enqueue_script ( 'moment.min', plugin_dir_url ( __FILE__ ) . './js/moment.min.js', array (
 			'jquery' 
-	), '1.0', true );
-	wp_enqueue_script ( 'knockout.mapping', plugin_dir_url ( __FILE__ ) . 'knockout.mapping.js', array (
-			'jquery' 
-	), '1.0', true );
-	wp_enqueue_script ( 'moment.min', plugin_dir_url ( __FILE__ ) . 'moment.min.js', array (
-			'jquery' 
-	), '1.0', true );
+	), '2.0', true );
 	
-	wp_enqueue_script ( 'lobbycal2press', plugin_dir_url ( __FILE__ ) . 'lobbycal2press.js', array (
+	wp_enqueue_script ( 'lobbycal2press', plugin_dir_url ( __FILE__ ) . './js/lobbycal2press.js', array (
 			'jquery' 
-	), '1.0', true );
+	), '2.0', true );
 	
 	// Load custom styles
 	
-	wp_enqueue_style ( 'lobbycal2press', plugin_dir_url ( __FILE__ ) . 'custom.css' );
-	wp_enqueue_style ( 'lobbycal2press-jqdt', plugin_dir_url ( __FILE__ ) . 'jquery.datatables.css' );
-	
+	wp_enqueue_style ( 'lobbycal2press', plugin_dir_url ( __FILE__ ) . './css/custom.css' );
+	wp_enqueue_style ( 'lobbycal2press-jqdt', plugin_dir_url ( __FILE__ ) . './css/jquery.datatables.css' );
 	// Configure according to settings
 	function lc2p_js_variables() {
 		$options = get_option ( 'lobbycal2press_settings' );
 		?>
 <script type="text/javascript">
 			var lc2pUrl = '<?php echo $options['lobbycal2press_text_field_apiURL']; ?>';
-
-			var lc2pMax = '<?php echo $options['lobbycal2press_text_field_max']; ?>';
 
 	        var lc2pShowStart  = '<?php echo $options['lobbycal2press_checkbox_field_start']; ?>';
 
@@ -86,7 +81,6 @@ function lobbycal2press_settings_init() {
 	add_settings_section ( 'lobbycal2press_pluginPage_section', __ ( 'Settings for lobbycal2press plugin', 'lobbycal2press' ), 'lobbycal2press_settings_section_callback', 'pluginPage' );
 	
 	add_settings_field ( 'lobbycal2press_text_field_apiURL', __ ( 'API URL for your MEP ', 'lobbycal2press' ), 'lobbycal2press_text_field_apiURL_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
-	add_settings_field ( 'lobbycal2press_text_field_max', __ ( 'Number of meetings to load', 'lobbycal2press' ), 'lobbycal2press_text_field_max_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 	add_settings_field ( 'lobbycal2press_text_field_perPage', __ ( 'Number of meetings to display on a table page', 'lobbycal2press' ), 'lobbycal2press_text_field_perPage_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 	
 	add_settings_field ( 'lobbycal2press_checkbox_field_start', __ ( 'Display column for start date?', 'lobbycal2press' ), 'lobbycal2press_checkbox_field_start_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
@@ -134,14 +128,7 @@ function lobbycal2press_textarea_field_example_render() {
 	&lt;/thead&gt;
 &lt;/table&gt; 	
 </textarea>
-<?php
-}
-function lobbycal2press_text_field_max_render() {
-	$options = get_option ( 'lobbycal2press_settings' );
-	?>
-<input type='text'
-	name='lobbycal2press_settings[lobbycal2press_text_field_max]' size="60"
-	value='<?php echo $options['lobbycal2press_text_field_max']; ?>'>
+
 <?php
 }
 function lobbycal2press_text_field_perPage_render() {
@@ -280,24 +267,6 @@ Last name ascending
 	<?php checked( $options['lobbycal2press_radio_field_order'],  'userLastName desc'); ?>
 	value='userLastName desc'>
 Last name descending
-</input>
-<br />
-
-
-
-
-<input type='radio'
-	name='lobbycal2press_settings[lobbycal2press_radio_field_order]'
-	<?php checked( $options['lobbycal2press_radio_field_order'], 'partners asc'); ?>
-	value='partners asc'>
-Partner ascending
-</input>
-<br />
-<input type='radio'
-	name='lobbycal2press_settings[lobbycal2press_radio_field_order]'
-	<?php checked( $options['lobbycal2press_radio_field_order'],  'partners desc'); ?>
-	value='partners desc'>
-Partner descending
 </input>
 <br />
 

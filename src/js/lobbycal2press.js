@@ -1,6 +1,6 @@
-//Initial data set : Please change the url to the one you received with your registration email 
-
-var meetingsURL = lc2pUrl;
+console.log(lc2pUrl);
+// var lc2pUrl = "http://localhost:8080/api/meetings/dt/22,26,35,36,43,45,47";
+console.log(lc2pUrl);
 var momentDateFormat = "LLL";
 if (lc2pDateFormat != "") {
 	momentDateFormat = lc2pDateFormat;
@@ -42,31 +42,90 @@ if (lc2pDateFormat != "") {
 	};
 
 }));
-ko.observableArray.fn.subscribeArrayChanged = function(addCallback,
-		deleteCallback) {
-	var previousValue = undefined;
-	this.subscribe(function(_previousValue) {
-		previousValue = _previousValue.slice(0);
-	}, undefined, 'beforeChange');
-	this.subscribe(function(latestValue) {
-		var editScript = ko.utils.compareArrays(previousValue, latestValue);
-		for (var i = 0, j = editScript.length; i < j; i++) {
-			switch (editScript[i].status) {
-			case "retained":
-				break;
-			case "deleted":
-				if (deleteCallback)
-					deleteCallback(editScript[i].value);
-				break;
-			case "added":
-				if (addCallback)
-					addCallback(editScript[i].value);
-				break;
+
+jQuery(document).ready(function() {
+	jQuery.fn.dataTable.moment(momentDateFormat);
+	jQuery('#lobbycal').DataTable().destroy();
+	var dt = jQuery('#lobbycal').DataTable({
+		'ajax' : lc2pUrl,
+		'serverSide' : true,
+		"info" : false,
+		columns : [ {
+			data : 'startDate',
+			searchable : false,
+			visible : (lc2pShowStart == "1"),
+			name : 'startDate',
+			render : function(date, type, full) {
+				return moment(date).format(momentDateFormat)
 			}
-		}
-		previousValue = undefined;
+		}, {
+			data : 'endDate',
+			searchable : false,
+			visible : (lc2pShowEnd == "1"),
+			name : 'endDate',
+			render : function(date, type, full) {
+				return moment(date).format(momentDateFormat)
+			}
+		}, {
+			data : 'userFirstName',
+			searchable : false,
+			visible : (lc2pShowFirstName == "1"),
+			name : 'userFirstName'
+		}, {
+			data : 'userLastName',
+			searchable : false,
+			visible : (lc2pShowLastName == "1"),
+			name : 'userLastName'
+		}, {
+			data : 'mPartner',
+			searchable : false,
+			visible : (lc2pShowPartner == "1"),
+			name : 'partner'
+		}, {
+			data :   'title',
+			visible : (lc2pShowTitle == "1"),
+			name : 'title',
+			render : function(data, type, row) {
+				if ( lc2pShowTagsTitle == "1") {
+					var tgs = dt.column('tag').data();
+					return data+ " " +mTags(tgs[0].split(" "));
+				} else {
+					return data;
+				}
+			}
+		}, {
+			data : 'mTag',
+			searchable : false,
+			visible : (lc2pShowTags == "1"),
+			name : 'tag',
+			render : function(data, type, row) {
+				return mTags(data.split(" "));
+			}
+		} ],
+		pageLength : parseInt(lc2pPerPage),
+		lengthMenu : [ parseInt(lc2pPerPage) ]
 	});
-};
+	var order = lc2pOrder.split(' ', 2)[1];
+	var cname = lc2pOrder.split(' ', 1)[0]
+
+	console.log(cname);
+	var cindx = dt.column(cname).index();
+	console.log(cindx);
+	if (cindx === undefined) {
+		cindx = 1;
+	}
+	console.log(cindx);
+	console.log(order);
+	dt.order([ cindx, order ]).draw();
+	jQuery('#lobbycal tbody').on('click', 'span', function() {
+		// var cell = dt.cell( $(".tag"));
+		console.log(this.innerHTML);
+		jQuery('.dataTables_filter input').val(this.innerHTML);
+		jQuery('.dataTables_filter input').click();
+		dt.search(this.innerHTML).draw();
+	});
+
+});
 
 function partners(partners) {
 	var res = "";
@@ -89,88 +148,6 @@ function partners(partners) {
 	return res;
 }
 
-function loadPage(nr) {
-	console.log("succ");
-	 meetingsURL = meetingsURL + "?page=" + nr;
-	if (lc2pMax != "") {
-		meetingsURL = meetingsURL + "&per_page=" + lc2pMax;
-	} else {
-		meetingsURL = meetingsURL + "&per_page=9999";
-		console.log(lc2pMax)
-	 }
-	jQuery.when(jQuery.getJSON(meetingsURL)).then(
-			function(data, textStatus, jqXHR) {
-
-				console.log(jqXHR.getResponseHeader('X-Total-Count'));
-				console.log(data);
-
-				sooo = jqXHR.responseJSON;
-				var meetings = ko.mapping.fromJS([]);
-				jQuery.fn.dataTable.moment(momentDateFormat);
-				console.log(meetingsURL);
-
-				var dt = $('#lobbycal').DataTable({
-					data :  { "data": data},
-					"info" : false,
-					columns : [ {
-						data : 'startDate()',
-						visible : (lc2pShowStart == "1")
-					}, {
-						data : 'endDate()',
-						visible : (lc2pShowEnd == "1")
-					}, {
-						data : 'userFirstName()',
-						visible : (lc2pShowFirstName == "1")
-					}, {
-						data : 'userLastName()',
-						visible : (lc2pShowLastName == "1")
-					}, {
-						data : 'partners()',
-						visible : (lc2pShowPartner == "1")
-					}, {
-						data : 'title()',
-						visible : (lc2pShowTitle == "1")
-					}, {
-						data : 'tags()',
-						visible : (lc2pShowTags == "1")
-					} ],
-					order : [ [ 1, "desc" ] ],
-					pageLength : parseInt(lc2pPerPage),
-					lengthMenu : [ parseInt(lc2pPerPage) ]
-				});
-
-				// make tags clickable
-
-				$('#lobbycal tbody').on('click', 'span', function() {
-					// var cell = dt.cell( $(".tag"));
-					console.log(this.innerHTML);
-					$('.dataTables_filter input').val(this.innerHTML);
-					$('.dataTables_filter input').click();
-					dt.search(this.innerHTML).draw();
-				});
-
-				// Update the table when the `meetings` array has items
-				// added or removed
-				meetings.subscribeArrayChanged(function(addedItem) {
-					dt.row.add(addedItem).draw();
-				}, function(deletedItem) {
-					var rowIdx = dt.column(0).data().indexOf(deletedItem.id);
-					dt.row(rowIdx).remove().draw();
-				});
-				// Convert the data set into observable objects, and
-				// will also add the
-				// initial data to the table
-				ko.mapping.fromJS(sooo, {
-					key : function(data) {
-						return ko.utils.unwrapObservable(data.id);
-					},
-					create : function(options) {
-						return new Meeting(options.data, dt);
-					}
-				}, meetings);
-			});
-}
-
 function tags(tags) {
 	var res = "";
 	jQuery.each(tags, function(key, tag) {
@@ -181,54 +158,14 @@ function tags(tags) {
 	});
 	return res;
 }
-// Meeting object
-var Meeting = function(data, dt) {
-	this.id = data.id;
-	this.startDate = ko.observable(moment(data.startDate).format(
-			momentDateFormat));
-	this.endDate = ko.observable(moment(data.endDate).format(momentDateFormat));
 
-	this.userLogin = ko.observable(data.userLogin);
-	this.userFirstName = ko.observable(data.userFirstName);
-	this.userLastName = ko.observable(data.userLastName);
-
-	if (partners.length != 0) {
-		this.partners = ko.observable(partners(data.partners));
-	}
-
-	var titleF = data.title;
-	if (tags.length != 0 && lc2pShowTagsTitle == "1") {
-		titleF += "<br/>" + tags(data.tags);
-	}
-
-	this.title = ko.observable(titleF);
-
-	if (tags.length != 0) {
-		this.tags = ko.observable(tags(data.tags));
-	} else {
-		this.tags = "";
-	}
-	this.full = ko.computed(function() {
-		return this.title() + " " + this.startDate();
-	}, this);
-
-	// Subscribe a listener to the observable properties for the table
-	// and invalidate the DataTables row when they change so it will redraw
-	var that = this;
-	jQuery.each([ 'startDate', 'endDate', 'userFirstName', 'userLastName',
-			'partners', 'title', 'tags' ], function(i, prop) {
-		that[prop].subscribe(function(val) {
-			// Find the row in the DataTable and invalidate it, which
-			// will
-			// cause DataTables to re-read the data
-			var rowIdx = dt.column(0).data().indexOf(that.id);
-			dt.row(rowIdx).invalidate();
-		});
+function mTags(tags) {
+	var res = "";
+	jQuery.each(tags, function(key, tag) {
+		if (tag != "") {
+			res += "<span class=\"tag " + (tag) + "\">" + (tag)
+					+ "</span><br/>";
+		}
 	});
-};
-var sooo;
-
-jQuery(document).ready(function($) {
-	loadPage(1);
-
-});
+	return res;
+}
