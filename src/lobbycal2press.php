@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /*
  * Plugin Name: lobbycal2press for wordpress
  * Plugin URI: http://lobbycal.transparency.eu
@@ -43,6 +44,8 @@ function lobbycal2press_scripts() {
 	        var lc2pShowEnd = '<?php echo $options['lobbycal2press_checkbox_field_end']; ?>';
 	        
 	        var lc2pDateFormat = '<?php echo $options['lobbycal2press_text_field_dateFormat']; ?>';
+
+	        var lc2pMomentLocale = '<?php echo $options['lobbycal2press_text_field_momentLocale']; ?>';
 
 	        var lc2pShowFirstName  = '<?php echo $options['lobbycal2press_checkbox_field_firstname']; ?>';
 
@@ -92,6 +95,7 @@ function lobbycal2press_settings_init() {
 	
 	add_settings_field ( 'lobbycal2press_checkbox_field_end', __ ( 'Display column for end date?', 'lobbycal2press' ), 'lobbycal2press_checkbox_field_end_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 	add_settings_field ( 'lobbycal2press_text_field_dateFormat', __ ( 'Date format <br/> see <a href="http://momentjs.com/"> here </a> for options', 'lobbycal2press' ), 'lobbycal2press_text_field_dateFormat_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
+	add_settings_field ( 'lobbycal2press_text_field_momentLocale', __ ( 'Language for dates <br/>Possible values: en,es,fr,sv,hu,de ... for all supported languages see <a href="http://momentjs.com/"> here </a> options', 'lobbycal2press' ), 'lobbycal2press_text_field_momentLocale_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 	
 	add_settings_field ( 'lobbycal2press_checkbox_field_firstname', __ ( 'Display column for MEP first name?', 'lobbycal2press' ), 'lobbycal2press_checkbox_field_firstname_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 	
@@ -99,7 +103,7 @@ function lobbycal2press_settings_init() {
 	
 	add_settings_field ( 'lobbycal2press_radio_field_order', __ ( 'What is the default order when loaded for the first time?', 'lobbycal2press' ), 'lobbycal2press_radio_field_order_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 	
-	add_settings_field ( 'lobbycal2press_textarea_field_example', __ ( 'Use this code to place the calendar in a post or page', 'lobbycal2press' ), 'lobbycal2press_textarea_field_example_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
+	add_settings_field ( 'lobbycal2press_textarea_field_example', __ ( 'Use this code to place the calendar in a post or page. Be sure to include the <B>complete<B> snippet. Only columns checked above will be displayed to your visitors ', 'lobbycal2press' ), 'lobbycal2press_textarea_field_example_render', 'pluginPage', 'lobbycal2press_pluginPage_section' );
 }
 function lobbycal2press_text_field_apiURL_render() {
 	$options = get_option ( 'lobbycal2press_settings' );
@@ -117,7 +121,7 @@ function lobbycal2press_textarea_field_example_render() {
 	rows="14" cols="50">&lt;table id=&quot;lobbycal&quot; aria-describedby=&quot;lobbycal_info&quot;&gt;
 	&lt;thead&gt;
 		&lt;tr&gt;
-			&lt;th&gt;Date&lt;/th&gt;
+			&lt;th&gt;Start&lt;/th&gt;
 			&lt;th&gt;End&lt;/th&gt;
 			&lt;th&gt;FirstName&lt;/th&gt;
 			&lt;th&gt;LastName&lt;/th&gt;
@@ -165,6 +169,15 @@ function lobbycal2press_text_field_dateFormat_render() {
 	name='lobbycal2press_settings[lobbycal2press_text_field_dateFormat]'
 	size="60"
 	value='<?php echo $options['lobbycal2press_text_field_dateFormat'];  ?>'>
+<?php
+}
+function lobbycal2press_text_field_momentLocale_render() {
+	$options = get_option ( 'lobbycal2press_settings' );
+	?>
+<input type='text'
+	name='lobbycal2press_settings[lobbycal2press_text_field_momentLocale]'
+	size="60"
+	value='<?php echo $options['lobbycal2press_text_field_momentLocale'];  ?>'>
 <?php
 }
 function lobbycal2press_checkbox_field_title_render() {
