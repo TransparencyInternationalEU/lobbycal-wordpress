@@ -1,24 +1,17 @@
 # lobbycal - wordpress plugin and standalone version
 
-## Use in wordpress
+The wordpress plugin code has moved.
 
-To use the plugin in wordpress 
+## Wordpress plugin
 
-1. install the file lobbycal2press.zip
-1. in your wordpress installation, adapt the URL to your lobbycal server account at Settings > Lobbycal2press
-1. place the following html fragment in a page, wher you would like the calendar to appear 
+Installation via worpdpress plugin manager or manual download of the lastest version: https://downloads.wordpress.org/plugin/lobbycal2press.zip.
 
-```html 
-<table id="lobbycal" aria-describedby="lobbycal_info">
-	<thead>
-		<tr>
-			<th>Date</th>
-			<th>End</th>
-			<th>FirstName</th>
-			<th>LastName</th>
-			<th>Partners</th>
-			<th>Title</th>
-			<th>Tags</th>
-		</tr>
-	</thead>
-</table>```
+Source code: https://plugins.svn.wordpress.org/lobbycal2press/trunk/.
+## Standalone client
+
+The standalone client consists of the wordpress plugin plus three files. To install, download the wordpress plugin and unzip in the desired location of your web server.
+
+Download the contents of https://github.com/TransparencyInternationalEU/lobbycal/tree/master/src/main/webapp/client-standalone to the same location.
+
+Edit the file 'standalone.js' and adapt the server URL, select which colums to display, sort order of columns, date format and other options, as described in the source code comments.
+
